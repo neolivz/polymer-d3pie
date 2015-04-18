@@ -1,3 +1,4 @@
 .bowerrc
 test/
 dummy/
+.DS_Store
