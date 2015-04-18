@@ -1,0 +1,408 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-ajax/core-ajax.html">
+<script src="../d3/d3.js" charset="utf-8"></script>
+<script src="../d3pie/d3pie/d3pie.js" charset="utf-8"></script>
+<polymer-element name="polymer-d3pie" attributes="title-text,title-font,title-fontsize,
+  title-color,title-location,subtitle,subtitle-font,subtitle-fontsize,subtitle-color,
+  subtitle-padding,footer,footer-font,footer-fontsize,footer-color,footer-location,
+  height,width,radius,inner-radius,sort,data,grouping,grouping-value,
+  grouping-type,outerlabel,outerlabel-distance,outerlabel-hide,
+  innerlabel,innerlabel-hide,mainlabel-font,mainlabel-fontsize,
+  mainlabel-fontcolor,percentage-font,percentage-fontsize,percentage-fontcolor,
+  percentage-decimal,value-font,value-fontsize,value-fontcolor,truncation,
+  lines-style,lines-color,tooltip,tooltip-type,tooltip-fade,
+  tooltip-color,tooltip-opacity,tooltip-fontcolor,tooltip-radius,tooltip-parser
+  tooltip-font,tooltip-fontsize,tooltip-padding,effect,effect-speed,pullout,pullout-speed,
+  pullout-size,highlight,background,pie-colors,segments,segment-stroke,gradient,
+  gradient-color,on-load,on-click,on-mouseover,on-mouseout,data-url,autoload
+  ">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+    </style>
+    <core-ajax
+      auto="false"
+      id="dataAjax"
+      url="{{dataUrl}}"
+      handleAs="json"
+      on-core-response="{{handleData}}"></core-ajax>
+
+    <div id="pie">
+
+    </div>
+  </template>
+  <script>
+    Polymer({
+      parseAttributes : function(){
+
+        for(key in this.attributes){
+          if(!isNaN(key)){
+            var attributeName = this.attributes[key].nodeName;
+            attributeName = attributeName.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+            this[attributeName] = this.attributes[key].nodeValue;
+          }
+        }
+      },
+
+      generateHeader : function(json){
+        var header;
+        if(this.titleText){
+          header = {};
+          var title = {};
+          title.text = this.titleText;
+          if(this.titleFont) title.font =this.titleFont;
+          if(this.titleColor) title.color =this.titleColor;
+          if(this.titleFontsize) title.fontSize =this.titleFontsize;
+          header.title = title;
+        }
+
+        if(this.subtitle){
+          header = header || {};
+          var subtitle = {};
+          subtitle.text = this.subtitle;
+          if(this.subtitleFont) subtitle.font =this.titleFont;
+          if(this.subtitleColor) subtitle.color =this.subtitleColor;
+          if(this.subtitleFontsize) subtitle.fontSize =this.subtitleFontsize;
+          header.subtitle = subtitle;
+          if(this.subtitlePadding) header.titleSubtitlePadding = parseInt(this.subtitlePadding);
+        }
+        if(header && this.titleLocation && (this.titleLocation == 'top-left' ||
+            this.titleLocation =='pie-center' )) {
+              header = header || {};
+          header.location = this.titleLocation;
+        }
+        json.header = header;
+
+      },
+
+      generateFooter : function(json){
+        if(this.footer){
+          var footer = {};
+          footer.text = this.footer;
+          if(this.footerColor) footer.color = this.footerColor;
+          if(this.footerFont) footer.font = this.footerFont;
+          if(this.footerFontsize) footer.fontSize = this.footerFontsize;
+          if(this.footerLocation) footer.location = this.footerLocation;
+          json.footer = footer;
+        }
+      },
+
+      generateCanvas : function(json){
+        var canvasSize = {}
+        if(this.height) canvasSize.canvasHeight = this.height;
+        if(this.width) canvasSize.canvasWidth = this.width;
+        if(this.radius) canvasSize.pieOuterRadius = this.radius;
+        if(this.innerRadius) canvasSize.pieInnerRadius = this.innerRadius;
+        json.size = canvasSize;
+      },
+
+      generateDataContent : function(content){
+        this.json.data.content = content;
+      },
+
+      generateData : function(json){
+        var data = {};
+        if(this.sort) data.sortOrder= this.sort;
+        if(this.grouping){
+          data.smallSegmentGrouping ={}
+          data.smallSegmentGrouping.enabled = true;
+          data.smallSegmentGrouping.label =this.grouping;
+          if(this.groupingType) data.smallSegmentGrouping.valueType= this.groupingType;
+          if(this.groupingValue) data.smallSegmentGrouping.value = this.groupingValue;
+        }
+        if(this.data){
+          this.generateDataContent(this.data);
+        } else if(this.dataUrl){
+          this.$.dataAjax.go()
+          //TODO: Implement ajax loading of data
+        } else{
+          this.autoload = false
+        }
+        json.data = data;
+      },
+
+      generateOuterLabels: function(json){
+        var labels;
+        if(this.outerlabel){
+          labels = json.labels = {};
+
+          var outer = {
+            "format": this.outerlabel
+          };
+          if(this.outerlabelHide) outer.hideWhenLessThanPercentage = parseInt(this.outerlabelHide);
+          if(this.outerlabelDistance) outer.pieDistance = parseInt(this.outerlabelDistance);
+          labels.outer = outer;
+        }
+      },
+
+      generateInnerLabels : function(json){
+        var labels;
+        if(this.innerlabel){
+          labels = json.labels =json.labels || {};
+          var inner = {
+            "format":this.innerlabel
+          };
+          if(this.innerlabelHide) inner.hideWhenLessThanPercentage = parseInt(this.innerlabelHide);
+          labels.inner = inner;
+        }
+      },
+
+      generateMainLabels : function(json){
+        var mainLabel;
+        if(this.mainlabelFont){
+          mainLabel = {};
+          mainLabel.font = this.mainlabelFont;
+        }
+        if(this.mainlabelFontsize){
+          mainLabel = mainLabel || {};
+          mainLabel.fontSize = parseInt(this.mainlabelFontsize);
+        }
+        if(this.mainlabelFontcolor){
+          mainLabel =  mainLabel || {};
+          mainLabel.color = this.mainlabelFontcolor;
+        }
+        if(mainLabel){
+          json.labels = json.labels || {};
+          json.labels.mainLabel = mainLabel;
+        }
+      },
+
+      generatePercentageLabels : function(json){
+        var percentage;
+        if(this.percentageFontcolor){
+          percentage = {};
+          percentage.color = this.percentageFontcolor;
+        }
+        if(this.percentageFont){
+          percentage = percentage || {};
+          percentage.font = this.percentageFont;
+        }
+        if(this.percentageFontsize){
+          percentage = percentage || {};
+          percentage.fontSize = parseInt(this.percentageFontsize);
+        }
+        if(this.percentageDecimal){
+          percentage = percentage || {};
+          percentage.decimalPlaces = parseInt(this.percentageDecimal);
+        }
+        if(percentage){
+          json.labels = json.labels || {};
+          json.labels.percentage = percentage;
+        }
+
+      },
+
+      generateValueLabels : function(json){
+        var value;
+        if(this.valueFontcolor){
+          value = {};
+          value.color = this.valueFontcolor;
+        }
+        if(this.valueFont ){
+          value = value || {};
+          value.font = this.valueFont;
+        }
+        if(this.percentageFontsize){
+          value = value || {};
+          value.fontSize = parseInt(this.valueFontsize);
+        }
+        if(value){
+          json.labels = json.labels || {};
+          json.labels.value = value;
+        }
+
+      },
+
+      generateLines: function(json){
+        var lines;
+        if(this.linesStyle){
+          lines = {};
+          lines.style = this.linesStyle;
+        }
+        if(this.linesColor ){
+          lines = lines || {};
+          lines.color = this.linesColor;
+        }
+        if(lines){
+          json.labels =json.labels || {};
+          json.labels.lines = lines;
+        }
+
+      },
+
+      generateTruncation: function(json){
+        if(this.truncation){
+          json.labels = json.labels || {};
+          json.labels.truncation = {};
+          json.labels.truncation.enabled = true;
+          json.labels.truncation.length = parseInt(this.truncation);
+        }
+      },
+
+      generateLabels:function(json){
+        this.generateOuterLabels(json);
+        this.generateInnerLabels(json);
+        this.generateMainLabels(json);
+        this.generatePercentageLabels(json);
+        this.generateValueLabels(json);
+        this.generateTruncation(json);
+        this.generateLines(json);
+      },
+
+      generateTooltips: function(json){
+        var tooltips;
+        if(this.tooltip){
+          tooltips = {
+            enabled:true,
+            string: this.tooltip
+          }
+          if(this.tooltipType) tooltips.type = this.tooltipType;
+          var styles = {};
+          if(this.tooltipFont) styles.font = this.tooltipFont;
+          if(this.tooltipFade) styles.fadeInSpeed = this.tooltipFade;
+          if(this.tooltipColor) styles.backgroundColor = this.tooltipColor;
+          if(this.tooltipOpacity) styles.backgroundOpacity = this.tooltipOpacity;
+          if(this.tooltipFontcolor) styles.color = this.tooltipFontcolor;
+          if(this.tooltipFontsize) styles.fontSize = this.tooltipFontsize;
+          if(this.tooltipPadding) styles.padding = this.tooltipPadding;
+          if(this.tooltipRadius) styles.borderRadius = this.tooltipRadius;
+          if(Object.keys(styles).length>0)
+            tooltips.styles = styles;
+          json.tooltips = tooltips;
+        }
+
+      },
+
+      generateEffects:function(json){
+        var effects;
+        if(this.effect){
+          effects = {}
+          var load = {
+            effect:this.effect
+          };
+          if(this.effectSpeed) load.speed = parseInt(this.effectSpeed);
+          effects.load = load;
+        }
+        if(this.pullout){
+          effects = effects || {};
+          var pullout = {
+            effect:this.pullout
+          };
+          if(this.pulloutSpeed) pullout.speed = parseInt(this.pulloutSpeed);
+          if(this.pulloutSize) pullout.size = parseInt(this.pulloutSize);
+          effects.pullOutSegmentOnClick = pullout;
+        }
+        if(this.highlight){
+          effects || {};
+          effects.highlightSegmentOnMouseover =true;
+          effects.highlightLuminosity = this.highlight;
+        }
+        if(effects)
+          json.effects = effects;
+      },
+
+      generateMisc : function(json){
+        var misc = {};
+        var colors ={}
+        if(this.background){
+          colors.background = this.background;
+        }
+        if(this.segments){
+          colors.segments = this.segments.split(",");
+        }
+        if(this.segmentStroke){
+          colors.segmentStroke = this.segmentStroke;
+        }
+        if(Object.keys(colors).length>0){
+          misc.colors =colors;
+        }
+        if(this.gradient){
+          var gradient = {
+            enabled:true,
+            percentage: this.gradient
+          }
+          if(this.gradientColor) gradient.color= this.gradientColor;
+          misc.gradient = gradient;
+        }
+
+        if(Object.keys(misc).length>0){
+          json.misc = misc;
+        }
+      },
+
+      generateCallbacks: function(json){
+        var callbacks = {};
+
+        callbacks.onload = function(){
+          this.fire('loaded')
+        }.bind(this);
+        callbacks.onMouseoverSegment = function(info){
+          this.fire('mouse-over',info);
+        }.bind(this);
+        callbacks.onMouseoutSegment  = function(info){
+          this.fire('mouse-out',info);
+        }.bind(this);
+        callbacks.onClickSegment  = function(info){
+          this.fire('on-click',info);
+        }.bind(this);
+        json.callbacks =callbacks;
+      },
+
+      ready: function(){
+        //TODO: Polymer 0.8 will parse automatically
+        this.parseAttributes();
+        this.json ={};
+
+        this.generateHeader(this.json);
+        this.generateFooter(this.json);
+        this.generateCanvas(this.json);
+        this.generateData(this.json);
+        this.generateLabels(this.json);
+        this.generateTooltips(this.json);
+        this.generateEffects(this.json);
+        this.generateMisc(this.json);
+        this.generateCallbacks(this.json);
+
+
+
+      },
+      handleData:function(evt,data){
+        // this.setData(data.response)
+      },
+      setData:function(data){
+        this.generateDataContent(data);
+        // console.log(JSON.stringify(this.json));
+        // var pie = new d3pie(this.$.pie, this.json,this.shadowRoot);
+      },
+      domReady:function(){
+        this.setData([
+          {"label":"JavaScript","value":264131,"color":"#2484c1"},
+          {"label":"Ruby","value":218812,"color":"#0c6197"},
+          {"label":"Java","value":157618,"color":"#4daa4b"},
+          {"label":"PHP","value":114384,"color":"#90c469"},
+          {"label":"Python","value":95002,"color":"#daca61"},
+          {"label":"C+","value":78327,"color":"#e4a14b"},
+          {"label":"C","value":67706,"color":"#e98125"},
+          {"label":"Objective-C","value":36344,"color":"#cb2121"},
+          {"label":"Shell","value":28561,"color":"#830909"},
+          {"label":"Cobol","value":24131,"color":"#923e99"},
+          {"label":"C#","value":100,"color":"#ae83d5"},
+          {"label":"Coldfusion","value":68,"color":"#bf273e"},
+          {"label":"Fortran","value":218812,"color":"#ce2aeb"},
+          {"label":"Coffeescript","value":157618,"color":"#bca44a"},
+          {"label":"Node","value":114384,"color":"#618d1b"},
+          {"label":"Basic","value":95002,"color":"#1ee67b"},
+          {"label":"Cola","value":36344,"color":"#b0ec44"},
+          {"label":"Perl","value":32170,"color":"#a4a0c9"}
+        ]);
+        console.log(JSON.stringify(this.json));
+        var pie = new d3pie(this.$.pie,this.json,this.shadowRoot);
+
+      }
+    });
+
+  </script>
+</polymer-element>

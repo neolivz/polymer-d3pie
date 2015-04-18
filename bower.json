@@ -1,0 +1,30 @@
+{
+  "name": "polymer-d3pie",
+  "version": "0.0.1",
+  "homepage": "https://github.com/neolivz/polymer-d3pie",
+  "authors": [
+    "Jishnu Viswanath <neo.9801@gmail.com>"
+  ],
+  "description": "Polymer implementation of d3pie",
+  "main": "polymer-d3pie.html",
+  "keywords": [
+    "polymer",
+    "d3",
+    "d3pie",
+    "chart"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "../",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "core-component-page": "Polymer/core-component-page#^0.5",
+    "d3": "~3.5.5",
+    "d3pie": "neolivz/d3pie#~0.1.6"
+  }
+}
