@@ -378,11 +378,7 @@ z<link rel="import" href="../polymer/polymer.html">
         callbacks.onload = function(){
           if(this.autoOpen){
             this.pie.openSegment(this.autoOpen);
-            var self = this;
-            setTimeout(function(){
-              console.log(self.pulloutSpeed,"loaded");
-              self.fireOpenSegment();
-            },parseInt(self.pulloutSpeed)+200)
+            this.fireOpenSegment();
           }
           this.fire('loaded')
         }.bind(this);
@@ -400,7 +396,11 @@ z<link rel="import" href="../polymer/polymer.html">
       },
 
       fireOpenSegment: function(){
-          this.fire('open-segment',this.pie.getOpenSegment());
+        var self = this;
+        setTimeout(function(){
+          console.log(self.pulloutSpeed,"loaded");
+          self.fire('open-segment',self.pie.getOpenSegment());
+        },parseInt(self.pulloutSpeed)+100);
       },
 
       handleData:function(evt,data){
