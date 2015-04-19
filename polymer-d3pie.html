@@ -108,7 +108,12 @@ z<link rel="import" href="../polymer/polymer.html">
 
       generateDataContent : function(content){
         if(typeof this.data === 'string'){
-          content = JSON.parse(content);
+          try{
+            content = JSON.parse(content);
+          }catch(err){
+            content = [100];
+          }
+
         }
         if(typeof content === 'object' && content.constructor === Array){
           for(key in content){

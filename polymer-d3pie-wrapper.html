@@ -1,0 +1,93 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="polymer-d3pie.html">
+<polymer-element name="polymer-d3pie-wrapper" attributes="">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <polymer-d3pie
+      auto
+      active="{{active}}"
+      title-text="Demo"
+      title-font="courier"
+      title-fontsize=24
+      title-color="#010101"
+      title-location="pie-center"
+      subtitle="D3Pie"
+      subtitle-font="courier"
+      subtitle-fontsize=20
+      subtitle-color="#002288"
+      subtitle-padding=23
+      footer="footer text"
+      footer-font="open sans"
+      footer-fontsize=20
+      footer-color="lightGreen"
+      height=700
+      width=700
+      radius="70%"
+      inner-radius="50%"
+      sort="random"
+      grouping="Random Others"
+      grouping-value="20"
+      grouping-type="value"
+      outerlabel="label-value2"
+      outerlabel-hide=2
+      outerlabel-distance=15
+      innerlabel="percentage"
+      innerlabel-hide=3
+      mainlabel-font="open sans"
+      mainlabel-fontsize=20
+      mainlabel-fontcolor="red"
+      percentage-font="verdana"
+      percentage-decimal=0
+      percentage-fontsize=15
+      percentage-fontcolor="white"
+      value-font="ariel"
+      value-fontsize=15
+      value-fontcolor="blue"
+      truncation=10
+      lines-style="straight"
+      lines-color="red"
+      tooltip="{label},{value}"
+      tooltip-type="placeholder"
+      tooltip-font="verdana"
+      tooltip-fade="1000"
+      tooltip-color="green"
+      tooltip-radius=10
+      tooltip-opacity="0.8"
+      tooltip-fontsize="10"
+      tooltip-fontcolor="white"
+      effect="default"
+      effect-speed="2000"
+      pullout="lienar"
+      pullout-speed=2000
+      pullout-size=25
+      highlight=-0.5
+      segment-stroke="#008888"
+      segments="#ff0000,#00ff00,#0000ff,#ffff00,#ff00ff,#00ffff"
+      gradient=70
+      gradient-color="#111111"
+      on-load="onloadAlert"
+      data="{{data}}"
+
+    ></polymer-d3pie>
+  </template>
+  <script>
+    Polymer({
+      ready: function(){
+        this.data = '[10,20,30,40]';
+        this.active = false;
+        // document.querySelector('polymer-d3pie').addEventListener('loaded', function(info) {
+        //   console.log("loaded");
+        // });
+        // document.querySelector('polymer-d3pie').addEventListener('on-click', function(info) {
+        //   console.log("on-click",info);
+        // });
+        // document.querySelector('polymer-d3pie').setAttribute('data',"[10,20,30,40,50]")
+      }
+
+    });
+  </script>
+</polymer-element>
