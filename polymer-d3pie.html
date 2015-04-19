@@ -15,7 +15,7 @@ z<link rel="import" href="../polymer/polymer.html">
   tooltip-color,tooltip-opacity,tooltip-fontcolor,tooltip-radius,tooltip-parser
   tooltip-font,tooltip-fontsize,tooltip-padding,effect,effect-speed,pullout,pullout-speed,
   pullout-size,highlight,background,pie-colors,segments,segment-stroke,gradient,
-  gradient-color,on-load,on-click,on-mouseover,on-mouseout,data-url,autoload,active
+  gradient-color,on-load,on-click,on-mouseover,on-mouseout,data-url,autoload,active,auto-open
   ">
   <template>
     <style>
@@ -376,7 +376,10 @@ z<link rel="import" href="../polymer/polymer.html">
         var callbacks = {};
 
         callbacks.onload = function(){
-          this.fire('loaded')
+          if(this.autoOpen){
+            this.pie.openSegment(this.autoOpen);
+          }
+          this.fire('loaded');
         }.bind(this);
         callbacks.onMouseoverSegment = function(info){
           this.fire('mouse-over',info);
@@ -422,8 +425,10 @@ z<link rel="import" href="../polymer/polymer.html">
         this._render()
       },
       _render: function(){
-        if(this._active && this.json.data && this.json.data.content && (this.auto || this.renderReady) )
+        if(this._active && this.json.data && this.json.data.content && (this.auto || this.renderReady) ){
           this.pie = new d3pie(this.$.pie, this.json,this.shadowRoot);
+
+        }
       },
 
       ready: function(){
