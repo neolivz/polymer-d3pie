@@ -403,7 +403,7 @@ z<link rel="import" href="../polymer/polymer.html">
         //TODO: Polymer 0.8 will parse automatically
         this.parseAttributes();
         this.json ={};
-        this.auto = !('false' == this.auto);
+        this.auto = !('false' == this.auto || false == this.auto);
 
         this.generateHeader(this.json);
         this.generateFooter(this.json);
