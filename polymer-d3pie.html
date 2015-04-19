@@ -378,9 +378,13 @@ z<link rel="import" href="../polymer/polymer.html">
         callbacks.onload = function(){
           if(this.autoOpen){
             this.pie.openSegment(this.autoOpen);
-            this.fireOpenSegment();
+            var self = this;
+            setTimeout(function(){
+              console.log(self.pulloutSpeed,"loaded");
+              self.fireOpenSegment();
+            },parseInt(self.pulloutSpeed)+200)
           }
-          this.fire('loaded');
+          this.fire('loaded')
         }.bind(this);
         callbacks.onMouseoverSegment = function(info){
           this.fire('mouse-over',info);
