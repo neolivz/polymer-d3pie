@@ -378,6 +378,7 @@ z<link rel="import" href="../polymer/polymer.html">
         callbacks.onload = function(){
           if(this.autoOpen){
             this.pie.openSegment(this.autoOpen);
+            this.fireOpenSegment();
           }
           this.fire('loaded');
         }.bind(this);
@@ -389,8 +390,13 @@ z<link rel="import" href="../polymer/polymer.html">
         }.bind(this);
         callbacks.onClickSegment  = function(info){
           this.fire('on-click',info);
+          this.fireOpenSegment();
         }.bind(this);
         json.callbacks =callbacks;
+      },
+
+      fireOpenSegment: function(){
+          this.fire('open-segment',this.pie.getOpenSegment());
       },
 
       handleData:function(evt,data){
