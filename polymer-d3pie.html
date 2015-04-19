@@ -45,7 +45,8 @@ z<link rel="import" href="../polymer/polymer.html">
       },
 
       recreate: function(){
-        this.pie.destroy();
+        if(this.pie)
+          this.pie.destroy();
         this.init();
         this._render();
       },
@@ -426,7 +427,6 @@ z<link rel="import" href="../polymer/polymer.html">
       },
 
       ready: function(){
-        window.mypie = this;
       },
 
       domReady:function(){
