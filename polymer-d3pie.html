@@ -112,14 +112,31 @@ z<link rel="import" href="../polymer/polymer.html">
           if(this.groupingType) data.smallSegmentGrouping.valueType= this.groupingType;
           if(this.groupingValue) data.smallSegmentGrouping.value = this.groupingValue;
         }
+        json.data = data;
+
         if(this.data){
-          this.generateDataContent(this.data);
+          if(typeof this.data === 'string'){
+            this.data = JSON.parse(this.data);
+          }
+          if(typeof this.data === 'object' && this.data.constructor === Array){
+            for(key in this.data){
+              if(typeof this.data[key] === 'number'){
+                this.data[key] ={
+                  "label":"",
+                  "value":this.data[key]
+                }
+              }
+            }
+            console.log(this.data);
+            this.generateDataContent(this.data);
+          }else{
+            throw Error("Data provided is not an array")
+          }
         } else if(this.dataUrl){
           this.$.dataAjax.go()
         } else{
           this.autoload = false
         }
-        json.data = data;
       },
 
       generateOuterLabels: function(json){
@@ -353,6 +370,7 @@ z<link rel="import" href="../polymer/polymer.html">
         //TODO: Polymer 0.8 will parse automatically
         this.parseAttributes();
         this.json ={};
+        this.auto = ('' == this.auto) && ('false' != this.auto);
 
         this.generateHeader(this.json);
         this.generateFooter(this.json);
@@ -366,16 +384,25 @@ z<link rel="import" href="../polymer/polymer.html">
       },
 
       handleData:function(evt,data){
-        this.setData(data.response)
+        this.setData(data.response);
+        this._render();
       },
 
       setData:function(data){
         this.generateDataContent(data);
-        var pie = new d3pie(this.$.pie, this.json,this.shadowRoot);
+      },
+
+      render: function(){
+        this.renderReady = true;
+        this._render()
+      },
+      _render: function(){
+        if(this.json.data && this.json.data.content && (this.auto || this.renderReady) )
+          this.pie = new d3pie(this.$.pie, this.json,this.shadowRoot);
       },
 
       domReady:function(){
-
+        this._render();
       }
     });
 
