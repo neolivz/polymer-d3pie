@@ -10,7 +10,7 @@
     <polymer-d3pie
       auto
       active="{{active}}"
-      title-text="Demo"
+      title-text="{{titleText}}"
       title-font="courier"
       title-fontsize=24
       title-color="#010101"
@@ -30,8 +30,8 @@
       inner-radius="50%"
       sort="random"
       grouping="Random Others"
-      grouping-value="20"
-      grouping-type="value"
+      grouping-value="10"
+      grouping-type="percentage"
       outerlabel="label-value2"
       outerlabel-hide=2
       outerlabel-distance=15
@@ -77,8 +77,14 @@
   <script>
     Polymer({
       ready: function(){
-        this.data = '[10,20,30,40]';
-        this.active = false;
+        this.data = '[10,20,30,40,30,40]';
+        this.active = true;
+        this.titleText = "Demo";
+        window.wrap = this;
+        var self = this;
+        setTimeout(function(){
+          self.data = '[10,20]';
+        },4000)
         // document.querySelector('polymer-d3pie').addEventListener('loaded', function(info) {
         //   console.log("loaded");
         // });

@@ -2,6 +2,7 @@ z<link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-ajax/core-ajax.html">
 <script src="../d3/d3.js" charset="utf-8"></script>
 <script src="../d3pie/d3pie/d3pie.js" charset="utf-8"></script>
+<script src="../watch/src/watch.js" charset="utf-8"></script>
 <polymer-element name="polymer-d3pie" attributes="title-text,title-font,title-fontsize,
   title-color,title-location,subtitle,subtitle-font,subtitle-fontsize,subtitle-color,
   subtitle-padding,footer,footer-font,footer-fontsize,footer-color,footer-location,
@@ -40,8 +41,12 @@ z<link rel="import" href="../polymer/polymer.html">
       attributeChanged: function(){
         //As of now any attribute changes we are recreating the pie
         //TODO: Change it to individual attribute
+        this.recreate();
+      },
+
+      recreate: function(){
         this.pie.destroy();
-        this.ready();
+        this.init();
         this._render();
       },
 
@@ -49,8 +54,14 @@ z<link rel="import" href="../polymer/polymer.html">
         for(key in this.attributes){
           if(!isNaN(key)){
             var attributeName = this.attributes[key].nodeName;
-            attributeName = attributeName.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
-            this[attributeName] = this.attributes[key].nodeValue;
+            var undashedAttributeName = attributeName.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+              this[undashedAttributeName] = this[attributeName];
+              watch(this,attributeName,function(prop){
+                var undashed = prop.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+                console.log("WATCH ALERT:",prop);
+                this[undashed] = this[prop];
+                this.recreate();
+              });
           }
         }
       },
@@ -389,24 +400,14 @@ z<link rel="import" href="../polymer/polymer.html">
         this.generateDataContent(data);
       },
 
-      render: function(){
-        this.renderReady = true;
-        this._render()
-      },
-      _render: function(){
-        console.log(this.json)
-        if(this._active && this.json.data && this.json.data.content && (this.auto || this.renderReady) )
-          this.pie = new d3pie(this.$.pie, this.json,this.shadowRoot);
-      },
-
-      ready: function(){
-        window.mypie = this;
+      init: function(){
         this._active = this.active!='false'
         console.log("mY Pie");
         //TODO: Polymer 0.8 will parse automatically
         this.parseAttributes();
         this.json ={};
-        this.auto = ('' == this.auto) && ('false' != this.auto);
+        this.auto = !('false' == this.auto);
+        console.log(this.data);
 
         this.generateHeader(this.json);
         this.generateFooter(this.json);
@@ -419,7 +420,23 @@ z<link rel="import" href="../polymer/polymer.html">
         this.generateCallbacks(this.json);
       },
 
+      render: function(){
+        this.renderReady = true;
+        this._render()
+      },
+      _render: function(){
+        console.log(this.json);
+        if(this._active && this.json.data && this.json.data.content && (this.auto || this.renderReady) )
+          this.pie = new d3pie(this.$.pie, this.json,this.shadowRoot);
+      },
+
+      ready: function(){
+        window.mypie = this;
+      },
+
       domReady:function(){
+        this.init();
+        console.log(this.data);
         this._render();
       }
     });
