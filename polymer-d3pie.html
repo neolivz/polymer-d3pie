@@ -14,7 +14,7 @@ z<link rel="import" href="../polymer/polymer.html">
   tooltip-color,tooltip-opacity,tooltip-fontcolor,tooltip-radius,tooltip-parser
   tooltip-font,tooltip-fontsize,tooltip-padding,effect,effect-speed,pullout,pullout-speed,
   pullout-size,highlight,background,pie-colors,segments,segment-stroke,gradient,
-  gradient-color,on-load,on-click,on-mouseover,on-mouseout,data-url,autoload
+  gradient-color,on-load,on-click,on-mouseover,on-mouseout,data-url,autoload,active
   ">
   <template>
     <style>
@@ -36,8 +36,16 @@ z<link rel="import" href="../polymer/polymer.html">
   </template>
   <script>
     Polymer({
-      parseAttributes : function(){
 
+      attributeChanged: function(){
+        //As of now any attribute changes we are recreating the pie
+        //TODO: Change it to individual attribute
+        this.pie.destroy();
+        this.ready();
+        this._render();
+      },
+
+      parseAttributes : function(){
         for(key in this.attributes){
           if(!isNaN(key)){
             var attributeName = this.attributes[key].nodeName;
@@ -99,7 +107,23 @@ z<link rel="import" href="../polymer/polymer.html">
       },
 
       generateDataContent : function(content){
+        if(typeof this.data === 'string'){
+          content = JSON.parse(content);
+        }
+        if(typeof content === 'object' && content.constructor === Array){
+          for(key in content){
+            if(typeof content[key] === 'number'){
+              content[key] ={
+                "label":"",
+                "value":content[key]
+              }
+            }
+          }
+          console.log(content);
         this.json.data.content = content;
+        }else{
+          throw Error("Data provided is not an array")
+        }
       },
 
       generateData : function(json){
@@ -115,23 +139,8 @@ z<link rel="import" href="../polymer/polymer.html">
         json.data = data;
 
         if(this.data){
-          if(typeof this.data === 'string'){
-            this.data = JSON.parse(this.data);
-          }
-          if(typeof this.data === 'object' && this.data.constructor === Array){
-            for(key in this.data){
-              if(typeof this.data[key] === 'number'){
-                this.data[key] ={
-                  "label":"",
-                  "value":this.data[key]
-                }
-              }
-            }
-            console.log(this.data);
             this.generateDataContent(this.data);
-          }else{
-            throw Error("Data provided is not an array")
-          }
+
         } else if(this.dataUrl){
           this.$.dataAjax.go()
         } else{
@@ -366,23 +375,6 @@ z<link rel="import" href="../polymer/polymer.html">
         json.callbacks =callbacks;
       },
 
-      ready: function(){
-        //TODO: Polymer 0.8 will parse automatically
-        this.parseAttributes();
-        this.json ={};
-        this.auto = ('' == this.auto) && ('false' != this.auto);
-
-        this.generateHeader(this.json);
-        this.generateFooter(this.json);
-        this.generateCanvas(this.json);
-        this.generateData(this.json);
-        this.generateLabels(this.json);
-        this.generateTooltips(this.json);
-        this.generateEffects(this.json);
-        this.generateMisc(this.json);
-        this.generateCallbacks(this.json);
-      },
-
       handleData:function(evt,data){
         this.setData(data.response);
         this._render();
@@ -397,8 +389,29 @@ z<link rel="import" href="../polymer/polymer.html">
         this._render()
       },
       _render: function(){
-        if(this.json.data && this.json.data.content && (this.auto || this.renderReady) )
+        console.log(this.json)
+        if(this._active && this.json.data && this.json.data.content && (this.auto || this.renderReady) )
           this.pie = new d3pie(this.$.pie, this.json,this.shadowRoot);
+      },
+
+      ready: function(){
+        window.mypie = this;
+        this._active = this.active!='false'
+        console.log("mY Pie");
+        //TODO: Polymer 0.8 will parse automatically
+        this.parseAttributes();
+        this.json ={};
+        this.auto = ('' == this.auto) && ('false' != this.auto);
+
+        this.generateHeader(this.json);
+        this.generateFooter(this.json);
+        this.generateCanvas(this.json);
+        this.generateData(this.json);
+        this.generateLabels(this.json);
+        this.generateTooltips(this.json);
+        this.generateEffects(this.json);
+        this.generateMisc(this.json);
+        this.generateCallbacks(this.json);
       },
 
       domReady:function(){

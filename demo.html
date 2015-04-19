@@ -37,8 +37,8 @@
       inner-radius="50%"
       sort="random"
       grouping="Random Others"
-      grouping-value="10"
-      grouping-type="percentage"
+      grouping-value="20"
+      grouping-type="value"
       outerlabel="label-value2"
       outerlabel-hide=2
       outerlabel-distance=15
@@ -77,10 +77,9 @@
       gradient=70
       gradient-color="#111111"
       on-load="onloadAlert"
-      data="[10,20,30,40,50]"
+      data-url="./data/data.json"
 
     ></polymer-d3pie>
-    <!-- data-url="./data/data.json" -->
 
     <script charset="utf-8">
 
@@ -91,8 +90,9 @@
         document.querySelector('polymer-d3pie').addEventListener('on-click', function(info) {
           console.log("on-click",info);
         });
+        document.querySelector('polymer-d3pie').setAttribute('data',"[10,20,30,40,50]")
         // document.querySelector('polymer-d3pie').render();
-      },3000)
+      },10000)
 
 
     </script>
