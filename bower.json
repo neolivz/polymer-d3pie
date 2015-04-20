@@ -26,6 +26,7 @@
     "core-component-page": "Polymer/core-component-page#^0.5",
     "d3": "~3.5.5",
     "d3pie": "neolivz/d3pie#~0.1.9",
-    "watch": "*"
+    "watch": "*",
+    "core-ajax": "polymer/core-ajax#~0.5.5"
   }
 }
