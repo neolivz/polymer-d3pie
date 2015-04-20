@@ -34,14 +34,98 @@ z<link rel="import" href="../polymer/polymer.html">
     <div id="pie">
 
     </div>
+    {{active}}
   </template>
   <script>
     Polymer({
-
+      observe:{
+        'title-text' : 'observeChange',
+        'title-font' : 'observeChange',
+        'title-fontsize' : 'observeChange',
+        'title-color' : 'observeChange',
+        'title-location' : 'observeChange',
+        'subtitle' : 'observeChange',
+        'subtitle-font' : 'observeChange',
+        'subtitle-fontsize' : 'observeChange',
+        'subtitle-color' : 'observeChange',
+        'subtitle-padding' : 'observeChange',
+        'footer' : 'observeChange',
+        'footer-font' : 'observeChange',
+        'footer-fontsize' : 'observeChange',
+        'footer-color' : 'observeChange',
+        'footer-location' : 'observeChange',
+        'height' : 'observeChange',
+        'width' : 'observeChange',
+        'radius' : 'observeChange',
+        'inner-radius' : 'observeChange',
+        'sort' : 'observeChange',
+        'data' : 'observeChange',
+        'grouping' : 'observeChange',
+        'grouping-value' : 'observeChange',
+        'grouping-type' : 'observeChange',
+        'outerlabel' : 'observeChange',
+        'outerlabel-distance' : 'observeChange',
+        'outerlabel-hide' : 'observeChange',
+        'innerlabel' : 'observeChange',
+        'innerlabel-hide' : 'observeChange',
+        'mainlabel-font' : 'observeChange',
+        'mainlabel-fontsize' : 'observeChange',
+        'mainlabel-fontcolor' : 'observeChange',
+        'percentage-font' : 'observeChange',
+        'percentage-fontsize' : 'observeChange',
+        'percentage-fontcolor' : 'observeChange',
+        'percentage-decimal' : 'observeChange',
+        'value-font' : 'observeChange',
+        'value-fontsize' : 'observeChange',
+        'value-fontcolor' : 'observeChange',
+        'truncation' : 'observeChange',
+        'lines-style' : 'observeChange',
+        'lines-color' : 'observeChange',
+        'tooltip' : 'observeChange',
+        'tooltip-type' : 'observeChange',
+        'tooltip-fade' : 'observeChange',
+        'tooltip-color' : 'observeChange',
+        'tooltip-opacity' : 'observeChange',
+        'tooltip-fontcolor' : 'observeChange',
+        'tooltip-radius' : 'observeChange',
+        'tooltip-parser' : 'observeChange',
+        'tooltip-font' : 'observeChange',
+        'tooltip-fontsize' : 'observeChange',
+        'tooltip-padding' : 'observeChange',
+        'effect' : 'observeChange',
+        'effect-speed' : 'observeChange',
+        'pullout' : 'observeChange',
+        'pullout-speed' : 'observeChange',
+        'pullout-size' : 'observeChange',
+        'highlight' : 'observeChange',
+        'background' : 'observeChange',
+        'pie-colors' : 'observeChange',
+        'segments' : 'observeChange',
+        'segment-stroke' : 'observeChange',
+        'gradient' : 'observeChange',
+        'gradient-color' : 'observeChange',
+        'data-url' : 'observeChange',
+        'autoload' : 'observeChange',
+        'active' : 'observeChange',
+        'auto-open' : 'observeChange'
+      },
+      observeChange:function(){
+        console.log('Observe changed');
+        this.recreate();
+      },
       attributeChanged: function(){
         //As of now any attribute changes we are recreating the pie
+        console.log("attributeChanged");
         //TODO: Change it to individual attribute
         this.recreate();
+      },
+
+      activeChanged: function(){
+        console.log("activeChanged");
+      },
+
+      testChanged: function(){
+        console.log("Changed");
       },
 
       recreate: function(){
@@ -57,11 +141,7 @@ z<link rel="import" href="../polymer/polymer.html">
             var attributeName = this.attributes[key].nodeName;
             var undashedAttributeName = attributeName.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
               this[undashedAttributeName] = this[attributeName];
-              watch(this,attributeName,function(prop){
-                var undashed = prop.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
-                this[undashed] = this[prop];
-                this.recreate();
-              });
+
           }
         }
       },

@@ -8,6 +8,7 @@
       }
     </style>
     <polymer-d3pie
+      id="d3pie"
       auto
       active="{{active}}"
       title-text="{{titleText}}"
@@ -80,8 +81,9 @@
         this.data = '[10,20,30,40,30,40]';
         this.active = true;
         this.titleText = "Demo";
-        window.wrap = this;
         var self = this;
+        window.pieWrapper = this;
+        window.pie = this.$.d3pie;
         setTimeout(function(){
           self.data = '[10,20]';
         },4000)

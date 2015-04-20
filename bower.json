@@ -1,6 +1,6 @@
 {
   "name": "polymer-d3pie",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "homepage": "https://github.com/neolivz/polymer-d3pie",
   "authors": [
     "Jishnu Viswanath <neo.9801@gmail.com>"
@@ -26,7 +26,6 @@
     "core-component-page": "Polymer/core-component-page#^0.5",
     "d3": "~3.5.5",
     "d3pie": "neolivz/d3pie#~0.1.9",
-    "watch": "*",
     "core-ajax": "polymer/core-ajax#~0.5.5"
   }
 }
