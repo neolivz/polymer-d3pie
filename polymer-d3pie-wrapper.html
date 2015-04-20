@@ -16,7 +16,7 @@
       title-fontsize=24
       title-color="#010101"
       title-location="pie-center"
-      subtitle="D3Pie"
+      subtitle="{{subtitleText}}"
       subtitle-font="courier"
       subtitle-fontsize=20
       subtitle-color="#002288"
@@ -81,6 +81,7 @@
         this.data = '[10,20,30,40,30,40]';
         this.active = true;
         this.titleText = "Demo";
+        this.subtitleText ="D3PiE"
         var self = this;
         window.pieWrapper = this;
         window.pie = this.$.d3pie;
