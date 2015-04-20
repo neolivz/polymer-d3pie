@@ -127,8 +127,10 @@ z<link rel="import" href="../polymer/polymer.html">
       },
 
       recreate: function(){
-        if(this.pie)
+        if(this.pie){
+          console.log("Destroying Pie");
           this.pie.destroy();
+        }
         this.init();
         this._render();
       },
@@ -196,6 +198,7 @@ z<link rel="import" href="../polymer/polymer.html">
       },
 
       generateDataContent : function(content){
+        this.content = content;
         if(typeof this.data === 'string'){
           try{
             content = JSON.parse(content);
@@ -232,11 +235,13 @@ z<link rel="import" href="../polymer/polymer.html">
         json.data = data;
 
         if(this.data){
-            this.generateDataContent(this.data);
-
-        } else if(this.dataUrl){
+          this.generateDataContent(this.data);
+        } else if(this.dataUrl && this.dataUrl!=this._dataUrl){
+          this._dataUrl = this.dataUrl;
           this.$.dataAjax.go()
-        } else{
+        } else if(this.content){
+          this.generateDataContent(this.content);
+        } else {
           this.autoload = false
         }
       },
@@ -482,8 +487,9 @@ z<link rel="import" href="../polymer/polymer.html">
       },
 
       handleData:function(evt,data){
+        console.log("Handling Data");
         this.setData(data.response);
-        this._render();
+        this.recreate();
       },
 
       setData:function(data){
@@ -510,7 +516,7 @@ z<link rel="import" href="../polymer/polymer.html">
 
       render: function(){
         this.renderReady = true;
-        this._render()
+        this.recreate();
       },
       _render: function(){
         if(this._active && this.json.data && this.json.data.content && (this.auto || this.renderReady) ){
@@ -523,8 +529,7 @@ z<link rel="import" href="../polymer/polymer.html">
       },
 
       domReady:function(){
-        this.init();
-        this._render();
+        this.recreate();
       }
     });
 
